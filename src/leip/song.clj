@@ -50,6 +50,13 @@
            (concat (repeat 6 triad) [nil]))
    (where :pitch (from root))
    (all :amp 0.5)))
+
+(defn beat-it-chorus-2 [root]
+  (->>
+   (phrase [1/2 7/2] [triad triad])
+   (where :pitch (from root))
+   (all :amp 0.5)))
+
 (def beat-melody
   (->>
    (phrase (repeat 8 1/2) [nil 4 4 4 3 4 3 4])
@@ -90,8 +97,8 @@
    (mapthen (fn [k] (->>
                      (phrase (cycle [1]) (repeat 4 0))
                      (where :pitch (from k))
-                     (where :pitch (comp identity lower))
-                     (where :time #(- % 1/2))
+                     (where :pitch (comp lower lower))
+                     ;; (where :time #(- % 1/2))
                      ;; (canon (interval 7))
                      )))
    ;; (where :pitch (comp lower lower))
@@ -108,7 +115,7 @@
    (with (->>
           beat-melody
           (times 2)
-          (then (mapthen beat-it-chorus progression))))
+          (then (mapthen beat-it-chorus-2 progression))))
    (where :pitch (comp D scale/sharp minor))
    (tempo (bpm 137))))
 
@@ -117,7 +124,7 @@
 
    (->>
     beat-it-intro-melody
-    (where :pitch (comp lower identity))
+    (where :pitch (comp lower lower))
     ;; (canon (interval 7))
     (then (->> [5 6 0 -1]
                (mapthen beat-it-bass))))
@@ -150,3 +157,5 @@
   (live/stop))
 
   ;; track
+(defn play-intro []
+  (live/play beat-it-intro))
