@@ -38,16 +38,16 @@
 
 (defn beat-it-bass [root]
   (->>
-   (phrase (cycle [1/2 1/4 1/4]) (repeat 12 0))
+   (phrase (cycle [1]) (repeat 4 0))
    ;; (phrase (repeat 8 1/2) (repeat 8 0))
    (where :pitch (from root))
-   (canon (interval 7))
+   ;; (canon (interval 7))
    (where :pitch (comp lower lower))))
 
 (defn beat-it-chorus [root]
   (->>
-   (phrase (concat (repeat 4 1/2) [2])
-           (concat (repeat 4 triad) [nil]))
+   (phrase (concat (repeat 6 1/2) [1])
+           (concat (repeat 6 triad) [nil]))
    (where :pitch (from root))
    (all :amp 0.5)))
 (def beat-melody
@@ -88,11 +88,12 @@
   (->>
    intro-progression
    (mapthen (fn [k] (->>
-                     (phrase (cycle [1/4 1/4 1/2]) (repeat 12 0))
+                     (phrase (cycle [1]) (repeat 4 0))
                      (where :pitch (from k))
-                     (where :pitch (comp lower lower))
+                     (where :pitch (comp identity lower))
                      (where :time #(- % 1/2))
-                     (canon (interval 7)))))
+                     ;; (canon (interval 7))
+                     )))
    ;; (where :pitch (comp lower lower))
    (with (mapthen beat-it-drums intro-progression))
    (with beat-it-intro-melody)
@@ -116,8 +117,8 @@
 
    (->>
     beat-it-intro-melody
-    (where :pitch (comp lower lower))
-    (canon (interval 7))
+    (where :pitch (comp lower identity))
+    ;; (canon (interval 7))
     (then (->> [5 6 0 -1]
                (mapthen beat-it-bass))))
    (with (->> progression
