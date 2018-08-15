@@ -23,19 +23,17 @@
       (* (env-gen (adsr 0.01 0.2 0.8 0.2) (line:kr 1 0 dur) :action FREE))
       (* vol)))
 
-
+(def drum-kit
+  {:kick #(kick2 :amp 1)
+   :snare #(snare :amp 1.5)})
 ; Arrangement
 (defmethod live/play-note :default
   [{midi :pitch seconds :duration vol :amp}]
   (some-> midi
           midi->hz
           (overchauffeur seconds 1500)))
-(defmethod live/play-note :kick [note]
-  (kick2 130))
-(defmethod live/play-note :snare [note]
-  (snare 400 1.5))
-;; (kick2 150 1 1)
-;; (snare 1000 1 0.1)
+(defmethod live/play-note :beat [{drum :drum}]
+  ((drum drum-kit)))
                                         ;Composition
 
 (defn beat-it-bass [root]
@@ -73,21 +71,13 @@
            [0 2   4   9   7   8   7   6   nil 6   nil 0   2   4   9   7   8 7   6   nil])
    (where :time #(- % 1/2))))
 
-(defn beat-it-kick [root]
-  (->>
-   (phrase [1/2 1/2] [0 0])
-   (all :part :kick)))
-
-(defn beat-it-snare [root]
-  (->>
-   (phrase [1] [0])
-   (all :part :snare)))
 
 (defn beat-it-drums [root]
   (->>
-   (beat-it-kick root)
-   (then (beat-it-snare root))
-   (times 2)))
+   (rhythm (repeat 4 1/2))
+   (having :drum [:kick :kick :snare :kick])
+   (times 2)
+   (all :part :beat)))
 
                                         ; Track
 (def progression [0 6 0 6 5 6 0 -1])
